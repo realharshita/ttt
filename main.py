@@ -5,6 +5,7 @@ class TicTacToe:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("Tic-Tac-Toe")
+        self.window.configure(bg="lightblue")
         self.board = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
         self.current_player = 'X'
         self.game_mode = tk.IntVar()
@@ -14,39 +15,45 @@ class TicTacToe:
         self.window.mainloop()
 
     def create_widgets(self):
-        self.mode_label = tk.Label(self.window, text="Choose game mode:")
-        self.mode_label.grid(row=0, column=0, columnspan=3)
+        self.title_label = tk.Label(self.window, text="Tic-Tac-Toe", font=("Helvetica", 24, "bold"), bg="lightblue")
+        self.title_label.grid(row=0, column=0, columnspan=3, pady=(10, 0))
         
-        self.pvp_button = tk.Radiobutton(self.window, text="Player vs. Player", variable=self.game_mode, value=1)
-        self.pvp_button.grid(row=1, column=0, columnspan=3)
+        self.mode_label = tk.Label(self.window, text="Choose game mode:", font=("Helvetica", 14), bg="lightblue")
+        self.mode_label.grid(row=1, column=0, columnspan=3)
         
-        self.pvc_button = tk.Radiobutton(self.window, text="Player vs. Computer", variable=self.game_mode, value=2)
-        self.pvc_button.grid(row=2, column=0, columnspan=3)
+        self.pvp_button = tk.Radiobutton(self.window, text="Player vs. Player", variable=self.game_mode, value=1, font=("Helvetica", 12), bg="lightblue")
+        self.pvp_button.grid(row=2, column=0, columnspan=3)
+        
+        self.pvc_button = tk.Radiobutton(self.window, text="Player vs. Computer", variable=self.game_mode, value=2, font=("Helvetica", 12), bg="lightblue")
+        self.pvc_button.grid(row=3, column=0, columnspan=3)
 
-        self.difficulty_label = tk.Label(self.window, text="Choose difficulty level:")
-        self.difficulty_label.grid(row=3, column=0, columnspan=3)
+        self.difficulty_label = tk.Label(self.window, text="Choose difficulty level:", font=("Helvetica", 14), bg="lightblue")
+        self.difficulty_label.grid(row=4, column=0, columnspan=3)
         
-        self.easy_button = tk.Radiobutton(self.window, text="Easy", variable=self.difficulty, value="Easy")
-        self.easy_button.grid(row=4, column=0, columnspan=3)
+        self.easy_button = tk.Radiobutton(self.window, text="Easy", variable=self.difficulty, value="Easy", font=("Helvetica", 12), bg="lightblue")
+        self.easy_button.grid(row=5, column=0, columnspan=3)
         
-        self.hard_button = tk.Radiobutton(self.window, text="Hard", variable=self.difficulty, value="Hard")
-        self.hard_button.grid(row=5, column=0, columnspan=3)
+        self.hard_button = tk.Radiobutton(self.window, text="Hard", variable=self.difficulty, value="Hard", font=("Helvetica", 12), bg="lightblue")
+        self.hard_button.grid(row=6, column=0, columnspan=3)
         
-        self.start_button = tk.Button(self.window, text="Start Game", command=self.start_game)
-        self.start_button.grid(row=6, column=0, columnspan=3)
+        self.start_button = tk.Button(self.window, text="Start Game", command=self.start_game, font=("Helvetica", 12, "bold"), bg="green", fg="white", width=15, height=2)
+        self.start_button.grid(row=7, column=0, columnspan=3, pady=(10, 20))
         
         self.buttons = []
         for i in range(9):
-            button = tk.Button(self.window, text=self.board[i], width=10, height=3, command=lambda i=i: self.make_move(i))
-            button.grid(row=(i//3)+7, column=i%3)
+            button = tk.Button(self.window, text=self.board[i], width=10, height=3, command=lambda i=i: self.make_move(i), font=("Helvetica", 20, "bold"))
+            button.grid(row=(i//3)+8, column=i%3, padx=5, pady=5)
             self.buttons.append(button)
         
-        self.status_label = tk.Label(self.window, text="", fg="red")
-        self.status_label.grid(row=10, column=0, columnspan=3)
+        self.status_label = tk.Label(self.window, text="", font=("Helvetica", 14), fg="red", bg="lightblue")
+        self.status_label.grid(row=11, column=0, columnspan=3)
         
-        self.stats_label = tk.Label(self.window, text=self.get_statistics_text())
-        self.stats_label.grid(row=11, column=0, columnspan=3)
+        self.stats_label = tk.Label(self.window, text=self.get_statistics_text(), font=("Helvetica", 12), bg="lightblue")
+        self.stats_label.grid(row=12, column=0, columnspan=3)
         
+        self.reset_button = tk.Button(self.window, text="Reset Game", command=self.start_game, font=("Helvetica", 12, "bold"), bg="red", fg="white", width=15, height=2)
+        self.reset_button.grid(row=13, column=0, columnspan=3, pady=(10, 20))
+
     def get_statistics_text(self):
         return f"Player 1 Wins: {self.statistics['Player 1 Wins']}\nPlayer 2 Wins: {self.statistics['Player 2 Wins']}\nTies: {self.statistics['Ties']}"
 
@@ -58,7 +65,7 @@ class TicTacToe:
 
     def update_board(self):
         for i, button in enumerate(self.buttons):
-            button.config(text=self.board[i])
+            button.config(text=self.board[i], bg="SystemButtonFace")
     
     def make_move(self, index):
         if self.board[index] not in ['X', 'O']:
@@ -84,8 +91,20 @@ class TicTacToe:
             move = random.choice(available_moves)
         elif self.difficulty.get() == "Hard":
             move = self.best_move()
-        self.make_move(move)
-    
+        self.board[move] = 'O'
+        if self.check_win():
+            self.status_label.config(text="Player O wins!")
+            self.update_statistics('O')
+            self.update_board()
+            return
+        if self.check_tie():
+            self.status_label.config(text="It's a tie!")
+            self.update_statistics(None)
+            self.update_board()
+            return
+        self.current_player = 'X'
+        self.update_board()
+
     def best_move(self):
         best_score = -float('inf')
         best_move = None
