@@ -56,13 +56,19 @@ def choose_game_mode():
         except ValueError:
             print("Invalid input. Please enter a number.")
 
+def game_over_message(winner):
+    if winner:
+        print(f"Player {winner} wins!")
+    else:
+        print("It's a tie!")
+    print("Game Over")
+    
 def play_game():
     board = initialize_board()
     print_board(board)
     
     game_mode = choose_game_mode()
     current_player = 1
-    
     while not check_win(board) and not check_tie(board):
         if game_mode == 1:
             player_move = get_player_move(board, current_player)
@@ -78,10 +84,40 @@ def play_game():
         print_board(board)
         current_player = 2 if current_player == 1 else 1
     
-    if check_win(board):
-        print(f"Player {current_player} wins!")
-    else:
-        print("It's a tie!")
+    winner = current_player if check_win(board) else None
+    game_over_message(winner)
+    update_statistics(winner)
+    display_statistics()
+    if play_again():
+        play_game()
+
+def play_again():
+    while True:
+        replay = input("Do you want to play again? (yes/no): ").lower()
+        if replay in ['yes', 'no']:
+            return replay == 'yes'
+        else:
+            print("Invalid input. Please enter 'yes' or 'no'.")
+
+def update_statistics(winner):
+    if winner == 1:
+        statistics["Player 1 Wins"] += 1
+    elif winner == 2:
+        statistics["Player 2 Wins"] += 1
+    elif winner is None:
+        statistics["Ties"] += 1
+
+def display_statistics():
+    print("\nStatistics:")
+    print(f"Player 1 Wins: {statistics['Player 1 Wins']}")
+    print(f"Player 2 Wins: {statistics['Player 2 Wins']}")
+    print(f"Ties: {statistics['Ties']}\n")
+
+statistics = {
+    "Player 1 Wins": 0,
+    "Player 2 Wins": 0,
+    "Ties": 0
+}
 
 if __name__ == "__main__":
     play_game()
