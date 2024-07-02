@@ -64,8 +64,8 @@ class TicTacToe:
         self.status_label.config(text="")
 
     def update_board(self):
-        for i, button in enumerate(self.buttons):
-            button.config(text=self.board[i], bg="SystemButtonFace")
+    for i, button in enumerate(self.buttons):
+        button.config(text=self.board[i], bg="gray")
     
     def make_move(self, index):
         if self.board[index] not in ['X', 'O']:
